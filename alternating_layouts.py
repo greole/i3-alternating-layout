@@ -7,14 +7,21 @@ import sys
 import os
 
 
-def set_layout(node):
+def set_layout(node, parent):
     """
         Set the layout/split for the currently
         focused window to either vertical or
         horizontal, depending on its width/height
     """
+    if not node:
+        return
+
     height = node['rect']['height']
     width = node['rect']['width']
+    layout = parent['layout'] if parent else False
+
+    if layout == "tabbed" or layout == "stacked":
+        return
 
     if height > width:
         sway_set_split(node["id"], "splitv")
@@ -72,6 +79,13 @@ def traverse_sway_tree(json_tree, finder):
                         continue
         return False
 
+def get_focused_parent(json_tree):
+    if json_tree.get("nodes"):
+        for subnode in json_tree["nodes"]:
+            if subnode.get("focused"):
+                return json_tree
+    return False
+
 def get_focused_node(json_tree):
     if json_tree.get("focused"):
         return json_tree
@@ -111,8 +125,8 @@ def main():
     for line in process.stdout:
         tree = get_sway_tree()
         focused_node = traverse_sway_tree(tree, get_focused_node)
-        set_layout(focused_node)
-
+        parent = traverse_sway_tree(tree, get_focused_parent)
+        set_layout(focused_node, parent)
 
 if __name__ == "__main__":
     main()
