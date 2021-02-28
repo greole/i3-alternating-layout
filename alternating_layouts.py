@@ -111,7 +111,8 @@ def main():
     for line in process.stdout:
         tree = get_sway_tree()
         focused_node = traverse_sway_tree(tree, get_focused_node)
-        set_layout(focused_node)
+        if (not isinstance(focused_node,bool)): #skip when returned false(for floating windows)
+            set_layout(focused_node)
 
 
 if __name__ == "__main__":
