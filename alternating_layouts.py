@@ -60,6 +60,9 @@ def traverse_sway_tree(json_tree, finder):
         return traverse_sway_tree(json_tree["nodes"], finder)
     else:
         for subnode in json_tree:
+            if subnode.get("layout") == "tabbed" or subnode.get("layout") == "stacked":
+                # Don't alternate layout if a parent is in tabbed or stacked mode
+                continue
             ret = finder(subnode)
             if ret:
                 return ret
